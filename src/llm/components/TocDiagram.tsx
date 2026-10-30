@@ -8,6 +8,7 @@ import clsx from 'clsx';
 import { jumpToPhase } from '../Commentary';
 import { useProgramState } from '../Sidebar';
 import { Subscriptions } from '@/src/utils/hooks';
+import { tr } from '../i18n';
 
 enum ElType {
     Cell,
@@ -128,19 +129,19 @@ export const TocDiagram: React.FC<{
         entryGroups[entryGroups.length - 1].entries.push(entry);
     }
 
-    entryGroups.push({ groupName: 'Intro', entries: [] });
-    makeEntry(Phase.Intro_Intro, 'Introduction', []);
-    makeEntry(Phase.Intro_Prelim, 'Preliminaries', []);
+    entryGroups.push({ groupName: tr('Intro', '簡介'), entries: [] });
+    makeEntry(Phase.Intro_Intro, tr('Introduction', '概覽'), []);
+    makeEntry(Phase.Intro_Prelim, tr('Preliminaries', '預備知識'), []);
 
-    entryGroups.push({ groupName: 'Components', entries: [] });
+    entryGroups.push({ groupName: tr('Components', '元件'), entries: [] });
     makeEntry(Phase.Input_Detail_Embedding, 'Embedding', ['tokEmbed', 'posEmbed'], true);
     makeEntry(Phase.Input_Detail_LayerNorm, 'Layer Norm', ['ln1', 'ln2', 'lnf']);
     makeEntry(Phase.Input_Detail_SelfAttention, 'Self Attention', ['selfAttend']);
-    makeEntry(Phase.Input_Detail_Projection, 'Projection', ['selfAttend']);
+    makeEntry(Phase.Input_Detail_Projection, tr('Projection', 'Projection（投影）'), ['selfAttend']);
     makeEntry(Phase.Input_Detail_Mlp, 'MLP', ['feedForward']);
     makeEntry(Phase.Input_Detail_Transformer, 'Transformer', ['transformer']);
     makeEntry(Phase.Input_Detail_Softmax, 'Softmax', ['softmaxOut']);
-    makeEntry(Phase.Input_Detail_Output, 'Output', ['lnf', 'linear', 'softmaxOut'], true);
+    makeEntry(Phase.Input_Detail_Output, tr('Output', '輸出'), ['lnf', 'linear', 'softmaxOut'], true);
 
     function calcSizes(el: IEl): void {
         el.padX = el.padX ?? 0;
@@ -560,7 +561,7 @@ export const TocDiagram: React.FC<{
     let titleAbove = false;
 
     return <div>
-        {titleAbove && <div className={s.tocTitle}>Table of Contents</div>}
+        {titleAbove && <div className={s.tocTitle}>{tr('Table of Contents', '目錄')}</div>}
         <div className={s.tocDiagram}>
             <svg viewBox={`0 0 310 ${height}`} width={'310px'} height={height} ref={setDiagramEl}>
                 {exampleInfo?.node}
@@ -571,7 +572,7 @@ export const TocDiagram: React.FC<{
                 {renderTocToDigramLines()}
             </svg>
             <div className={s.toc}>
-                {!titleAbove && <div className={s.tocTitle}>Table of Contents</div>}
+                {!titleAbove && <div className={s.tocTitle}>{tr('Table of Contents', '目錄')}</div>}
                 {entryGroups.map((group, i) => {
 
                     return <React.Fragment key={i}>

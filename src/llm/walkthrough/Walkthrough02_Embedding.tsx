@@ -25,7 +25,11 @@ We saw previously how the tokens are mapped to a sequence of integers using a si
 These integers, the ${c_blockRef('_token indices_', state.layout.idxObj, DimStyle.TokenIdx)}, are the first and only time we see integers in the model.
 From here on out, we're using floats (decimal numbers).
 
-Let's take a look at how the 4th token (index 3) is used to generate the 4th column vector of our ${c_blockRef('_input embedding_', state.layout.residual0)}.`;
+Let's take a look at how the 4th token (index 3) is used to generate the 4th column vector of our ${c_blockRef('_input embedding_', state.layout.residual0)}.`.zh`
+
+先前我們看到，token 是透過一張簡單的查找表對應到一串整數。這些整數，也就是 ${c_blockRef('_token 索引_', state.layout.idxObj, DimStyle.TokenIdx)}，是我們在模型中第一次、也是唯一一次看到整數。從這裡開始，我們用的都是浮點數（小數）。
+
+我們來看看第 4 個 token（索引 3）如何被用來產生 ${c_blockRef('_輸入 embedding_', state.layout.residual0)} 的第 4 個欄向量。`;
     breakAfter();
 
     let t_moveCamera = afterTime(null, 1.0);
@@ -38,6 +42,11 @@ We use the token index (in this case ${c_str('B', DimStyle.Token)} = ${c_dimRef(
 Note we're using 0-based indexing here, so the first column is at index 0.
 
 This produces a column vector of size ${c_dimRef('_C_ = 48', DimStyle.C)}, which we describe as the token embedding.
+    `.zh`
+
+我們用 token 索引（這裡是 ${c_str('B', DimStyle.Token)} = ${c_dimRef('1', DimStyle.TokenIdx)}）選出左邊 ${c_blockRef('_token embedding 矩陣_', state.layout.tokEmbedObj)} 的第 2 欄。注意這裡的索引從 0 開始，所以第一欄的索引是 0。
+
+這會產生一個長度為 ${c_dimRef('_C_ = 48', DimStyle.C)} 的欄向量，我們稱之為 token embedding。
     `;
     breakAfter();
 
@@ -50,6 +59,11 @@ This produces a column vector of size ${c_dimRef('_C_ = 48', DimStyle.C)}, which
 And since we're looking at our token ${c_str('B', DimStyle.Token)} in the 4th _position_ (t = ${c_dimRef('3', DimStyle.T)}), we'll take the 4th column of the ${c_blockRef('_position embedding matrix_', state.layout.posEmbedObj)}.
 
 This also produces a column vector of size ${c_dimRef('_C_ = 48', DimStyle.C)}, which we describe as the position embedding.
+    `.zh`
+
+而因為我們看的是位於第 4 個「位置」（_position_）的 token ${c_str('B', DimStyle.Token)}（t = ${c_dimRef('3', DimStyle.T)}），所以我們取 ${c_blockRef('_position embedding 矩陣_', state.layout.posEmbedObj)} 的第 4 欄。
+
+這同樣會產生一個長度為 ${c_dimRef('_C_ = 48', DimStyle.C)} 的欄向量，我們稱之為 position embedding。
     `;
     breakAfter();
 
@@ -61,6 +75,12 @@ This also produces a column vector of size ${c_dimRef('_C_ = 48', DimStyle.C)}, 
 Note that both of these position and token embeddings are learned during training (indicated by their blue color).
 
 Now that we have these two column vectors, we simply add them together to produce another column vector of size ${c_dimRef('_C_ = 48', DimStyle.C)}.
+`.zh`
+
+注意，position embedding 與 token embedding 都是在訓練過程中學到的（以藍色表示）。
+
+有了這兩個欄向量後，我們只要把它們相加，就得到另一個長度為 ${c_dimRef('_C_ = 48', DimStyle.C)} 的欄向量。
+
 `;
 
     breakAfter();
@@ -77,6 +97,11 @@ Now that we have these two column vectors, we simply add them together to produc
 
     commentary(wt)`
 We now run this same process for all of the tokens in the input sequence, creating a set of vectors which incorporate both the token values and their positions.
+
+`.zh`
+
+接著，我們對輸入序列中的所有 token 執行同樣的流程，得到一組同時包含 token 值與位置資訊的向量。
+
 
 `;
 
@@ -96,6 +121,14 @@ is one of the several "hyperparameters" of the model, and is chosen by the desig
 
 This matrix, which we'll refer to as the ${c_blockRef('_input embedding_', state.layout.residual0)} is now ready to be passed down through the model.
 This collection of ${c_dimRef('T', DimStyle.T)} columns each of length ${c_dimRef('C', DimStyle.C)} will become a familiar sight throughout this guide.
+`.zh`
+
+你可以把滑鼠移到 ${c_blockRef('_輸入 embedding_', state.layout.residual0)} 矩陣的各個格子上，查看它的計算方式與數值來源。
+
+可以看到，對輸入序列中所有 token 執行這個流程後，會得到一個大小為 ${c_dimRef('_T_', DimStyle.T)} x ${c_dimRef('_C_', DimStyle.C)} 的矩陣。${c_dimRef('_T_', DimStyle.T)} 代表 ${c_dimRef('_time_', DimStyle.T)}（時間），也就是說，你可以把序列中越後面的 token 想成時間上越晚出現。${c_dimRef('_C_', DimStyle.C)} 代表 ${c_dimRef('_channel_', DimStyle.C)}（通道），也稱為「特徵」、「維度」或「embedding 大小」。這個長度 ${c_dimRef('_C_', DimStyle.C)} 是模型的幾個「超參數」之一，由設計者在模型大小與效能之間權衡後決定。
+
+這個矩陣，我們稱之為 ${c_blockRef('_輸入 embedding_', state.layout.residual0)}，現在已經準備好往下傳進模型。這種由 ${c_dimRef('T', DimStyle.T)} 個欄、每欄長度為 ${c_dimRef('C', DimStyle.C)} 組成的結構，在整份導覽中會經常看到。
+
 `;
 
     cleanup(t9_cleanupInstant, [t3_moveTokenEmbed, t5_movePosEmbed, t6_plusSymAnim, t7_addAnim, t8_placeAnim]);

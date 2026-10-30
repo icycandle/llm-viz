@@ -6,6 +6,7 @@ import { Vec3, Vec4 } from "@/src/utils/vector";
 import { IWalkthrough, Phase, PhaseGroup } from "./Walkthrough";
 import { IProgramState } from "../Program";
 import { ICameraPos } from "../Camera";
+import { isZh } from "../i18n";
 
 export interface IWalkthroughArgs {
     state: IProgramState;
@@ -109,6 +110,8 @@ export function eventEndTime(evt: ITimeInfo) {
 export interface ICommentary extends ITimeInfo {
     strings: TemplateStringsArray;
     values: any[];
+    /** Traditional Chinese (zh-TW) version, used in place of the English one when that language is selected. */
+    zh: (stringsArr: TemplateStringsArray, ...values: any[]) => ICommentary;
 }
 
 export function isCommentary(evt: ITimeInfo): evt is ICommentary {
@@ -130,6 +133,13 @@ export function commentary(wt: IWalkthrough, prev?: ITimeInfo | null, duration?:
             ...commentaryT,
             strings: stringsArr,
             values,
+            zh: (zhStringsArr, ...zhValues) => {
+                if (isZh()) {
+                    res.strings = zhStringsArr;
+                    res.values = zhValues;
+                }
+                return res;
+            },
         };
 
         wt.times[wt.times.length - 1] = res; // replace the time info with the commentary

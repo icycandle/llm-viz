@@ -34,6 +34,18 @@ His YouTube series ${embedLink("Neural Networks: Zero to Hero", zeroToHeroLink)}
 guide. The toy model featured here is based on one found within the minGPT project.
 
 Alright, let's get started!
+`.zh`
+
+在深入演算法的細節之前，我們先稍微退一步看看全貌。
+
+本導覽聚焦在「推論」（_inference_），而不是訓練，因此只涵蓋整個機器學習流程中的一小部分。在這裡，模型的權重已經事先訓練好，我們用推論過程來產生輸出。這一切都直接在你的瀏覽器裡執行。
+
+這裡展示的模型屬於 GPT（generative pre-trained transformer，生成式預訓練 transformer）家族，可以描述為一種「根據上下文預測 token 的機器」。OpenAI 在 2018 年推出這個家族，知名成員包括 GPT-2、GPT-3 與 GPT-3.5 Turbo，其中 GPT-3.5 Turbo 正是廣為使用的 ChatGPT 的基礎。它可能也與 GPT-4 有關，但具體細節目前仍不得而知。
+
+本導覽的靈感來自 GitHub 專案 ${embedLink('minGPT', minGptLink)}，這是 ${embedLink('Andrej Karpathy', andrejLink)} 以 ${embedLink('PyTorch', pytorchLink)} 寫成的極簡 GPT 實作。他的 YouTube 系列 ${embedLink("Neural Networks: Zero to Hero", zeroToHeroLink)} 與 minGPT 專案，都是製作本導覽時非常寶貴的資源。這裡展示的迷你模型，就是以 minGPT 專案中的一個模型為基礎。
+
+好，我們開始吧！
+
 `;
 
 }

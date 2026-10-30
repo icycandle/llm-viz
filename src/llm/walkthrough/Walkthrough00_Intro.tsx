@@ -12,6 +12,7 @@ import { IProgramState } from "../Program";
 import { lerp } from "@/src/utils/math";
 import { drawDependences } from "../Interaction";
 import { drawDataFlow } from "../components/DataFlow";
+import { tr } from "../i18n";
 
 /*
 We're mostly on the right track here I think.
@@ -61,7 +62,10 @@ export function walkthroughIntro(args: IWalkthroughArgs) {
     let c0 = commentary(wt, null, 0)`Welcome to the walkthrough of the GPT large language model! Here we'll explore the model _nano-gpt_, with a mere 85,000 parameters.
 
 Its goal is a simple one: take a sequence of six letters: ${embed(ExampleInputOutput)}
-and sort them in alphabetical order, i.e. to "ABBBCC".`;
+and sort them in alphabetical order, i.e. to "ABBBCC".`.zh`歡迎來到 GPT 大型語言模型的導覽！這裡要探索的模型是 _nano-gpt_，它只有區區 85,000 個參數。
+
+它的目標很簡單：拿到一串六個字母：${embed(ExampleInputOutput)}
+然後依照字母順序排好，也就是排成「ABBBCC」。`;
 
     if (c0.t > 0) {
         for (let cube of layout.cubes) {
@@ -98,7 +102,9 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
 
     commentary(wt, t6)`We call each of these letters a ${tokenStr}, and the set of the model's different tokens make up its _vocabulary_:${embed(TokenVocab)}
 
-    From this table, each token is assigned a number, its ${tokenIdxStr}. And now we can enter this sequence of numbers into the model:${embed(ExampleTokenValues)}\n`;
+    From this table, each token is assigned a number, its ${tokenIdxStr}. And now we can enter this sequence of numbers into the model:${embed(ExampleTokenValues)}\n`.zh`我們把每個字母稱為一個 ${tokenStr}，模型所有不同的 token 組成了它的「詞彙表」（_vocabulary_）：${embed(TokenVocab)}
+
+表中每個 token 都被分配一個數字，也就是它的 ${c_str('_token 索引_', 0, DimStyle.TokenIdx)}。現在我們就可以把這串數字輸入模型：${embed(ExampleTokenValues)}\n`;
     breakAfter();
 
     let t7 = afterTime(null, 1.5, 0.5);
@@ -130,7 +136,8 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
     breakAfter();
 
     let c5 = commentary(wt)`In the 3d view, each green cell represents a number being processed, and each blue cell is a weight. ${embed(GreenBlueCells)}
-    Each number in the sequence first gets turned into a 48 element vector (a size chosen for this particular model). This is called an _embedding_.`;
+    Each number in the sequence first gets turned into a 48 element vector (a size chosen for this particular model). This is called an _embedding_.`.zh`在 3D 畫面中，每個綠色格子代表一個正在處理的數字，每個藍色格子則是一個權重（weight）。${embed(GreenBlueCells)}
+序列中的每個數字會先被轉換成一個有 48 個元素的向量（48 是這個模型選定的大小）。這稱為 _embedding_。`;
     breakAfter(c5);
 
     {
@@ -166,7 +173,7 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
     }
 
     breakAfter();
-    commentary(wt)`The embedding is then passed through the model, going through a series of layers, called transformers, before reaching the bottom.`;
+    commentary(wt)`The embedding is then passed through the model, going through a series of layers, called transformers, before reaching the bottom.`.zh`接著，embedding 會被送進模型，依序通過一系列稱為 transformer 的層，最後抵達底部。`;
     breakAfter();
 
     {
@@ -221,10 +228,10 @@ and sort them in alphabetical order, i.e. to "ABBBCC".`;
     }
 
     commentary(wt)`So what's the output? A prediction of the next token in the sequence. So at the 6th entry, we get probabilities that the next token is
-        going to be 'A', 'B', or 'C'.`
+        going to be 'A', 'B', or 'C'.`.zh`那輸出是什麼呢？是對序列中「下一個 token」的預測。所以在第 6 個位置，我們會得到下一個 token 是「A」、「B」或「C」的機率。`
 
     commentary(wt)`In this case, the model is pretty sure it's going to be 'A'. Now, we can feed this prediction back into the top of the model, and repeat
-    the entire process.`;
+    the entire process.`.zh`在這個例子中，模型相當確定下一個是「A」。接著，我們可以把這個預測接回模型頂端，重複整個流程。`;
 
     breakAfter();
 }
@@ -396,7 +403,7 @@ const TokenVocab: React.FC = () => {
                     <th>token</th><td>A</td><td>B</td><td>C</td>
                 </tr>
                 <tr className={s.tokIndex} style={{ color: dimStyleColor(DimStyle.TokenIdx).toHexColor() }}>
-                    <th>index</th><td>0</td><td>1</td><td>2</td>
+                    <th>{tr('index', '索引')}</th><td>0</td><td>1</td><td>2</td>
                 </tr>
             </tbody>
         </table>
@@ -416,12 +423,12 @@ const GreenBlueCells: React.FC = () => {
             <div className={s.cellInfoCol}>
                 <Cell nums={greenNums} color={greenColor} mul={0.5} />
                 <Graph nums={greenNums} color={greenColor} setNums={setGreenNums} />
-                <div className={s.cellInfoText}>being processed</div>
+                <div className={s.cellInfoText}>{tr('being processed', '處理中的數字')}</div>
             </div>
             <div className={s.cellInfoCol}>
                 <Cell nums={blueNums} color={blueColor} mul={1} />
                 <Graph nums={blueNums} color={blueColor} setNums={setBlueNums} />
-                <div className={s.cellInfoText}>weights</div>
+                <div className={s.cellInfoText}>{tr('weights', '權重')}</div>
             </div>
         </div>
     </div>

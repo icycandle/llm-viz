@@ -38,6 +38,23 @@ In the MLP, we put each of our ${c_dimRef('C = 48', DimStyle.C)} length column v
 3. A ${c_blockRef('linear transformation', block.mlpProjWeight)} with a ${c_blockRef('bias', block.mlpProjBias)} added, back to a vector of length ${c_dimRef('C', DimStyle.C)}
 
 Let's track one of those vectors:
+`.zh`
+
+
+transformer 區塊在 self-attention 之後的後半部，是 MLP（multi-layer perceptron，多層感知器）。名字有點拗口，但在這裡它就是一個只有兩層的簡單神經網路。
+
+和 self-attention 一樣，向量進入 MLP 之前，我們會先做一次 ${c_blockRef('layer normalization', block.ln2.lnResid)}。
+
+在 MLP 中，我們把每個長度為 ${c_dimRef('C = 48', DimStyle.C)} 的欄向量（各自獨立地）依序經過：
+
+1. 一個 ${c_blockRef('線性轉換', block.mlpFcWeight)} 並加上 ${c_blockRef('偏差', block.mlpFcBias)}，變成長度為 ${c_dimRef('4 * C', DimStyle.C4)} 的向量。
+
+2. GELU 激活函數（逐元素套用）
+
+3. 一個 ${c_blockRef('線性轉換', block.mlpProjWeight)} 並加上 ${c_blockRef('偏差', block.mlpProjBias)}，變回長度為 ${c_dimRef('C', DimStyle.C)} 的向量
+
+我們來追蹤其中一個向量：
+
 `;
     breakAfter();
 
@@ -48,6 +65,10 @@ Let's track one of those vectors:
 commentary(wt)`
 We first run through the matrix-vector multiplication with bias added, expanding the vector to length ${c_dimRef('4 * C', DimStyle.C4)}. (Note that the output matrix is transposed here.
 This is purely for vizualization purposes.)
+`.zh`
+
+我們先做加上偏差的矩陣與向量乘法，把向量擴展到長度 ${c_dimRef('4 * C', DimStyle.C4)}。（注意，這裡的輸出矩陣是轉置過的，純粹是為了方便視覺化。）
+
 `;
     breakAfter();
 
@@ -61,6 +82,14 @@ looks a lot like a ReLU function (computed as ${<code>max(0, x)</code>}), but it
 
 ${<ReluGraph />}
 
+`.zh`
+
+接著，我們對向量的每個元素套用 GELU 激活函數。這是所有神經網路的關鍵部分，用來為模型引入非線性。這裡使用的 GELU 函數，看起來和 ReLU 函數（計算方式為 ${<code>max(0, x)</code>}）很像，只是轉折處是平滑的曲線，而不是尖銳的折角。
+
+${<ReluGraph />}
+
+
+
 `;
     breakAfter();
 
@@ -70,6 +99,10 @@ ${<ReluGraph />}
 
 commentary(wt)`
 We then project the vector back down to length ${c_dimRef('C', DimStyle.C)} with another matrix-vector multiplication with bias added.
+`.zh`
+
+然後，我們再做一次加上偏差的矩陣與向量乘法，把向量投影回長度 ${c_dimRef('C', DimStyle.C)}。
+
 `;
     breakAfter();
 
@@ -79,6 +112,10 @@ We then project the vector back down to length ${c_dimRef('C', DimStyle.C)} with
 
 commentary(wt)`
 Like in the self-attention + projection section, we add the result of the MLP to its input, element-wise.
+`.zh`
+
+和 self-attention 加投影那一節一樣，我們把 MLP 的結果逐元素加回它的輸入上。
+
 `;
     breakAfter();
 
@@ -86,7 +123,9 @@ Like in the self-attention + projection section, we add the result of the MLP to
 
     breakAfter();
 commentary(wt)`
-We can now repeat this process for all of the columns in the input.`;
+We can now repeat this process for all of the columns in the input.`.zh`
+
+現在，我們可以對輸入中的所有欄重複這個流程。`;
 
     breakAfter();
 
@@ -98,6 +137,10 @@ We can now repeat this process for all of the columns in the input.`;
 
 commentary(wt)`
 And that's the MLP completed. We now have the output of the transformer block, which is ready to be passed to the next block.
+`.zh`
+
+這樣 MLP 就完成了。我們現在得到了 transformer 區塊的輸出，可以傳到下一個區塊。
+
 `;
 
     let targetIdx = 3;

@@ -47,6 +47,29 @@ concentrated on the highest probability tokens.
 We do this by dividing the logits (the output of the linear transformation) by the temperature before
 applying the softmax. Since the exponentiation in the softmax has a large effect on larger numbers,
 making them all closer together will reduce this effect.
+`.zh`
+
+
+終於，我們來到模型的最末端。最後一個 transformer 區塊的輸出會先經過一次 layer normalization，接著做一次線性轉換（矩陣乘法），這次不加偏差。
+
+這最後的轉換把每個欄向量從長度 C 變成長度 nvocab。因此，它實際上是為每一欄、針對詞彙表中的每個字各產生一個分數。這些分數有個特別的名字：logits。
+
+「logits」這個名稱來自「log-odds」，也就是每個 token 勝算（odds）的對數。之所以用「log」，是因為接下來套用的 softmax 會做指數運算，把它轉換成「勝算」或機率。
+
+為了把這些分數轉換成漂亮的機率，我們讓它們通過 softmax 運算。現在，對每一欄來說，模型都為詞彙表中的每個字分配了一個機率。
+
+在這個模型中，它實際上已經學會了「如何排序三種字母」這個問題的所有答案，所以機率會大幅集中在正確答案上。
+
+當我們讓模型一步步往前推進時，會用最後一欄的機率來決定要加到序列中的下一個 token。例如，如果我們已經輸入了六個 token，就使用第 6 欄的輸出機率。
+
+這一欄的輸出是一串機率，而我們必須從中實際挑出一個，作為序列中的下一個 token。做法是「從分布中取樣」，也就是依照機率加權，隨機選出一個 token。例如，機率為 0.9 的 token，有 90% 的機會被選中。
+
+不過也有其他做法，例如永遠選擇機率最高的 token。
+
+我們也可以用溫度（temperature）參數來控制分布的「平滑程度」。溫度越高，分布越平均；溫度越低，分布越集中在機率最高的幾個 token 上。
+
+做法是在套用 softmax 之前，先把 logits（線性轉換的輸出）除以溫度。由於 softmax 中的指數運算對較大的數字影響很大，把它們除以溫度、讓彼此更接近，就能減弱這個效果。
+
 `;
 
 }

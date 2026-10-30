@@ -25,6 +25,15 @@ higher-level abstractions and relationships. In the context of natural language 
 lower layers might learn grammar, syntax, and simple word associations, while the higher layers
 might capture more complex semantic relationships, discourse structures, and context-dependent meaning.
 
+`.zh`
+
+
+這就是一個完整的 transformer 區塊！
+
+這些區塊構成了所有 GPT 模型的主體，會重複好幾次：一個區塊的輸出送進下一個區塊，並延續 residual pathway。
+
+和深度學習中常見的情況一樣，我們很難確切說出每一層在做什麼，但大致有些概念：較前面的層傾向學習較低階的特徵與模式，而較後面的層則學會辨識與理解較高階的抽象概念與關係。以自然語言處理來說，較低的層可能學到文法、句法與簡單的詞語關聯，而較高的層可能捕捉到更複雜的語意關係、篇章結構，以及依賴上下文的意義。
+
 `;
 
 }

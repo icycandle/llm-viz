@@ -11,6 +11,7 @@ import { ModalWindow } from '@/src/utils/Portal';
 import s from './WelcomePopup.module.scss';
 import { TocDiagram } from './components/TocDiagram';
 import { Subscriptions, useSubscriptions } from '../utils/hooks';
+import { isZh } from './i18n';
 
 interface IWelcomePopupLS {
     visible: boolean;
@@ -53,7 +54,7 @@ export const WelcomePopup: React.FC<{}> = () => {
 
     return <ModalWindow className={s.modalWindow} backdropClassName={s.modalWindowBackdrop} onBackdropClick={hide}>
         <div className={s.header}>
-            <div className={s.title}>Welcome!</div>
+            <div className={s.title}>{isZh() ? '歡迎！' : 'Welcome!'}</div>
         </div>
         <div className={s.body}>
             {/* <div className={s.image}>
@@ -62,7 +63,11 @@ export const WelcomePopup: React.FC<{}> = () => {
             <div style={{ width: 600, flex: '0 0 auto' }}>
                 <TocDiagram activePhase={null} onEnterPhase={hide} />
             </div>
-            <div className={s.text}>
+            {isZh() ? <div className={s.text}>
+                <p>這是一個大型語言模型（LLM）的互動式 3D 視覺化，GPT-3 與 ChatGPT 就是這類模型。</p>
+                <p>我們展示一個設計相同、但規模非常小的模型，幫助你理解這些模型如何運作。</p>
+                <p>除了可以自由操作之外，我們也提供逐步導覽，一步步說明模型的運作過程，每一個加法、乘法與數學運算都會解釋。</p>
+            </div> : <div className={s.text}>
                 <p>This is an interactive 3D Visualization of a Large Language Model (LLM),
                     of the likes that powers GPT-3 & ChatGPT.</p>
                 <p>We show a very small model of the same design, to help you understand how
@@ -70,10 +75,10 @@ export const WelcomePopup: React.FC<{}> = () => {
                 <p>As well as being interactive, we provide a walkthrough of the model
                     showing the step-by-step process of how it works, with every single add, multiply &
                     math operation described.</p>
-            </div>
+            </div>}
         </div>
         <div className={s.footer}>
-            <button className={s.button} onClick={hide}>Get Started</button>
+            <button className={s.button} onClick={hide}>{isZh() ? '開始' : 'Get Started'}</button>
         </div>
     </ModalWindow>;
 };

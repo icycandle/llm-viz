@@ -35,7 +35,11 @@ The self-attention layer is perhaps the heart of the Transformer and of GPT. It'
 columns in our input embedding matrix "talk" to each other. Up until now, and in all other phases,
 the columns can be regarded independently.
 
-The self-attention layer is made up of several heads, and we'll focus on one of them for now.`;
+The self-attention layer is made up of several heads, and we'll focus on one of them for now.`.zh`
+
+self-attention 層或許是 Transformer 與 GPT 的核心。在這個階段，輸入 embedding 矩陣中的各欄會彼此「交談」。在此之前，以及在其他所有階段中，各欄都可以視為彼此獨立。
+
+self-attention 層由好幾個 head（注意力頭）組成，我們先專注在其中一個。`;
     breakAfter();
     let t_moveCamera = afterTime(null, 1.0);
     let t_highlightHeads = afterTime(null, 2.0);
@@ -55,7 +59,17 @@ ${embedInline(<ul>
 
 To produce one of these vectors, we perform a matrix-vector multiplication with a bias added. Each
 output cell is some linear combination of the input vector. E.g. for the ${c_blockRef('Q vectors', head2.qBlock)}, this is done with a dot product between
-a row of the ${c_blockRef('Q-weight matrix', head2.qWeightBlock)} and a column of the ${c_blockRef('input matrix', block0.ln1.lnResid)}.`;
+a row of the ${c_blockRef('Q-weight matrix', head2.qWeightBlock)} and a column of the ${c_blockRef('input matrix', block0.ln1.lnResid)}.`.zh`
+
+第一步是針對 ${c_blockRef('正規化後的輸入 embedding 矩陣', block0.ln1.lnResid)} 中的 ${c_dimRef('T', DimStyle.T)} 個欄，每一欄各產生三個向量。這三個向量就是 Q、K、V 向量：
+
+${embedInline(<ul>
+    <li>Q：<BlockText blk={head2.qBlock}>Query 向量（查詢）</BlockText></li>
+    <li>K：<BlockText blk={head2.kBlock}>Key 向量（鍵）</BlockText></li>
+    <li>V：<BlockText blk={head2.vBlock}>Value 向量（值）</BlockText></li>
+</ul>)}
+
+要產生其中一個向量，我們做一次矩陣與向量的乘法，再加上偏差。每個輸出格子都是輸入向量的某種線性組合。以 ${c_blockRef('Q 向量', head2.qBlock)} 為例，這是透過 ${c_blockRef('Q 權重矩陣', head2.qWeightBlock)} 的一列與 ${c_blockRef('輸入矩陣', block0.ln1.lnResid)} 的一欄做內積（dot product）來完成的。`;
     breakAfter();
 
     let t_focusQCol = afterTime(null, 1.0);
@@ -65,7 +79,9 @@ a row of the ${c_blockRef('Q-weight matrix', head2.qWeightBlock)} and a column o
     commentary(wt)`
 The dot product operation, which we'll see a lot of, is quite simple: We pair each element from
 the first vector with the corresponding element from the second vector, multiply the pairs together
-and then add the results up.`;
+and then add the results up.`.zh`
+
+內積運算之後會經常看到，它其實很簡單：把第一個向量的每個元素與第二個向量對應位置的元素配對，每對相乘，再把結果全部加起來。`;
     breakAfter();
 
     let t_moveDotCells = afterTime(null, 2.0, 0.5);
@@ -83,7 +99,12 @@ This is a general and simple way of ensuring each output element can be influenc
 elements in the input vector (where that influence is determined by the weights). Hence its frequent
 appearance in neural networks.
 
-We repeat this operation for each output cell in the Q, K, V vectors:`;
+We repeat this operation for each output cell in the Q, K, V vectors:`.zh`
+
+
+這是一種通用又簡單的方法，確保每個輸出元素都能受到輸入向量中所有元素的影響（影響程度由權重決定）。這也是它在神經網路中如此常見的原因。
+
+我們對 Q、K、V 向量中的每個輸出格子重複這個運算：`;
     breakAfter();
 
     let t_revertFocusCol = afterTime(null, 0.25, 0.5);
@@ -150,7 +171,61 @@ ${embedInline((() => {
 })())}
 
 For a more concrete example, let's look at the 6th column (${c_dimRef('t = 5', DimStyle.T)}), from which
-we will query from:`;
+we will query from:`.zh`
+
+我們要拿 Q（query）、K（key）、V（value）向量做什麼呢？名稱給了我們提示：「key」和「value」讓人聯想到軟體中的字典（dictionary），由 key 對應到 value。而「query」就是我們用來查找 value 的東西。
+
+${embedInline(<div className='ml-4'>
+    <div className='mt-1 text-center italic'>軟體類比</div>
+    <div className='text-sm mt-1 mb-1 text-gray-600'>查找表：</div>
+    <div className='font-mono'>{'table = { "key0": "value0", "key1": "value1", ... }'}</div>
+    <div className='text-sm mt-1 mb-1 text-gray-600'>查詢過程：</div>
+    <div className='font-mono'>{'table["key1"] => "value1"'}</div>
+</div>)}
+
+在 self-attention 中，我們不是只回傳單一項目，而是回傳所有項目的某種加權組合。為了算出權重，我們把一個 Q 向量分別與每個 K 向量做內積。把這些權重正規化之後，再用它們乘上對應的 V 向量，最後全部加總。
+
+${embedInline((() => {
+    let keyCol = dimStyleColor(DimStyle.Intermediates);
+    let valCol = dimStyleColor(DimStyle.A);
+    let qCol = dimStyleColor(DimStyle.Aggregates);
+
+    return <div className='ml-4'>
+        <div className='mt-1 text-center italic'>Self Attention</div>
+        <div className='text-sm mt-2 mb-1 text-gray-600'>查找表：</div>
+        <div className='font-mono flex items-center'>K:
+            <div className='mx-2 my-1'>{makeTextVector(keyCol)}</div>
+            <div className='mx-2 my-1'>{makeTextVector(keyCol)}</div>
+            <div className='mx-2 my-1'>{makeTextVector(keyCol)}</div>
+        </div>
+        <div className='font-mono flex items-center'>V:
+            <div className='mx-2 my-1'>{makeTextVector(valCol)}</div>
+            <div className='mx-2 my-1'>{makeTextVector(valCol)}</div>
+            <div className='mx-2 my-1'>{makeTextVector(valCol)}</div>
+        </div>
+        <div className='text-sm mt-2 mb-1 text-gray-600'>查詢過程：</div>
+        <div className='font-mono flex items-center'>
+            <div className='flex items-center'>Q: <div className='mx-2 my-1'>{makeTextVector(qCol)}</div></div>
+        </div>
+        <div className='font-mono flex items-center -ml-2 mt-2'>
+            <div className='flex items-center mx-2'>w0 = <div className='m-1'>{makeTextVector(qCol)}</div>.<div className='m-1'>{makeTextVector(keyCol)}</div></div>
+            <div className='flex items-center mx-2'>w1 = <div className='m-1'>{makeTextVector(qCol)}</div>.<div className='m-1'>{makeTextVector(keyCol)}</div></div>
+            <div className='flex items-center mx-2'>w2 = <div className='m-1'>{makeTextVector(qCol)}</div>.<div className='m-1'>{makeTextVector(keyCol)}</div></div>
+        </div>
+        <div className='font-mono flex items-center my-2'>
+            [w0n, w1n, w2n] =&nbsp;<span className='italic'>正規化</span>([w0, w1, w2])
+        </div>
+        <div className='font-mono flex items-center'>
+            result =
+            w0n * <div className='ml-2 mr-2 my-1'>{makeTextVector(valCol)}</div>&nbsp;+&nbsp;
+            w1n * <div className='ml-2 mr-2 my-1'>{makeTextVector(valCol)}</div>&nbsp;+&nbsp;
+            w2n * <div className='ml-2 mr-2 my-1'>{makeTextVector(valCol)}</div>
+        </div>
+
+    </div>;
+})())}
+
+我們來看一個更具體的例子：以第 6 欄（${c_dimRef('t = 5', DimStyle.T)}）作為發出查詢的一方：`;
     breakAfter();
 
     let t_focusQKVCols = afterTime(null, 1.0);
@@ -164,7 +239,11 @@ The {K, V} entries of our lookup are the 6 columns in the past, and the Q value 
 
 We first calculate the dot product between the ${c_blockRef('Q vector', head2.qBlock)} of the current column (${c_dimRef('t = 5', DimStyle.T)}) and the ${c_blockRef('K vectors', head2.kBlock)}
 of each of the those previous columns. These are then stored in the corresponding row (${c_dimRef('t = 5', DimStyle.T)})
-of the ${c_blockRef('attention matrix', head2.attnMtx)}.`;
+of the ${c_blockRef('attention matrix', head2.attnMtx)}.`.zh`
+
+這張查找表的 {K, V} 項目是過去的 6 個欄，而 Q 則來自目前的時間點。
+
+我們先計算目前這一欄（${c_dimRef('t = 5', DimStyle.T)}）的 ${c_blockRef('Q 向量', head2.qBlock)} 與前面每一欄的 ${c_blockRef('K 向量', head2.kBlock)} 之間的內積。這些結果會存放在 ${c_blockRef('attention 矩陣', head2.attnMtx)} 中對應的那一列（${c_dimRef('t = 5', DimStyle.T)}）。`;
     breakAfter();
 
     let t_processAttnRow = afterTime(null, 3.0);
@@ -183,7 +262,15 @@ ${c_dimRef('A', DimStyle.A)} is the length of the Q/K/V vectors. This scaling is
 dominating the normalization (softmax) in the next step.
 
 We'll mostly skip over the softmax operation (described later); suffice it to say, each row is normalized to sum
-to 1.`;
+to 1.`.zh`
+
+這些內積是衡量兩個向量相似程度的一種方式。如果兩者非常相似，內積就會很大；如果差異很大，內積就會很小，甚至是負的。
+
+只拿 query 去和「過去」的 key 比對，這種設計讓它成為「因果」（_causal_）self-attention。也就是說，token 無法「看見未來」。
+
+另一個細節是：做完內積之後，我們會除以 sqrt(${c_dimRef('A', DimStyle.A)})，其中 ${c_dimRef('A', DimStyle.A)} 是 Q/K/V 向量的長度。這個縮放是為了避免過大的數值在下一步的正規化（softmax）中占據主導地位。
+
+softmax 運算我們先大致略過（之後會說明），這裡只要知道每一列會被正規化成總和為 1 即可。`;
     breakAfter();
 
     let t_processAttnSmAggRow = afterTime(null, 1.0);
@@ -193,7 +280,9 @@ to 1.`;
     commentary(wt)`
 Finally, we can produce the output vector for our column (${c_dimRef('t = 5', DimStyle.T)}). We look at the (${c_dimRef('t = 5', DimStyle.T)}) row of the
 ${c_blockRef('normalized self-attention matrix', head2.attnMtxSm)} and for each element, multiply the corresponding ${c_blockRef('V vector', head2.vBlock)} of the
-other columns element-wise.`;
+other columns element-wise.`.zh`
+
+最後，我們可以產生這一欄（${c_dimRef('t = 5', DimStyle.T)}）的輸出向量。我們查看 ${c_blockRef('正規化後的 self-attention 矩陣', head2.attnMtxSm)} 的第 (${c_dimRef('t = 5', DimStyle.T)}) 列，把其中的每個元素，分別乘上對應欄的 ${c_blockRef('V 向量', head2.vBlock)}（逐元素相乘）。`;
     breakAfter();
 
     let t_zoomVOutput = afterTime(null, 0.4, 0.5);
@@ -210,7 +299,11 @@ other columns element-wise.`;
 Then we can add these up to produce the output vector. Thus, the output vector will be dominated by
 V vectors from columns that have high scores.
 
-Now we know the process, let's run it for all the columns.`;
+Now we know the process, let's run it for all the columns.`.zh`
+
+接著把這些結果加總，就得到輸出向量。因此，輸出向量主要會由分數高的那些欄的 V 向量所主導。
+
+了解流程之後，我們對所有欄都執行一次。`;
 
     breakAfter();
 
@@ -224,6 +317,10 @@ And that's the process for a head of the self-attention layer. So the main goal 
 that each column wants to find relevant information from other columns and extract their values, and
 does so by comparing its _query_ vector to the _keys_ of those other columns. With the added restriction
 that it can only look in the past.
+`.zh`
+
+這就是 self-attention 層中一個 head 的完整流程。self-attention 的主要目標是：每一欄都想從其他欄找出相關的資訊並取出它們的值，做法是拿自己的 _query_ 向量去和其他欄的 _key_ 比對。另外還有一個限制：它只能往過去看。
+
 `;
 
 // Running this process for all the columns produces our self-attention matrix, which is a square

@@ -19,6 +19,7 @@ import { walkthrough06_Projection } from "./Walkthrough06_Projection";
 import { walkthrough07_Mlp } from "./Walkthrough07_Mlp";
 import { walkthrough08_Transformer } from "./Walkthrough08_Transformer";
 import { walkthrough09_Output } from "./Walkthrough09_Output";
+import { tr } from "../i18n";
 
 
 /**
@@ -85,23 +86,23 @@ export function initWalkthrough() {
         phaseTransitiveData: null as any,
         phaseList: [{
             groupId: PhaseGroup.Intro,
-            title: 'Introduction',
+            title: tr('Introduction', '簡介'),
             phases: [
-                { id: Phase.Intro_Intro, title: 'Overview' },
-                { id: Phase.Intro_Prelim, title: 'Preliminary' },
+                { id: Phase.Intro_Intro, title: tr('Overview', '概覽') },
+                { id: Phase.Intro_Prelim, title: tr('Preliminary', '預備知識') },
             ],
         }, {
             groupId: PhaseGroup.Detailed_Input,
-            title: 'Detailed',
+            title: tr('Detailed', '詳解'),
             phases: [
                 { id: Phase.Input_Detail_Embedding, title: 'Embedding' },
                 { id: Phase.Input_Detail_LayerNorm, title: 'Layer Norm' },
                 { id: Phase.Input_Detail_SelfAttention, title: 'Self Attention' },
-                { id: Phase.Input_Detail_Projection, title: 'Projection' },
+                { id: Phase.Input_Detail_Projection, title: tr('Projection', 'Projection（投影）') },
                 { id: Phase.Input_Detail_Mlp, title: 'MLP' },
                 { id: Phase.Input_Detail_Transformer, title: 'Transformer' },
                 { id: Phase.Input_Detail_Softmax, title: 'Softmax' },
-                { id: Phase.Input_Detail_Output, title: 'Output' },
+                { id: Phase.Input_Detail_Output, title: tr('Output', '輸出') },
             ],
         }] as IPhaseGroup[],
     };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { LayerView } from '@/src/llm/LayerView';
 import { InfoButton } from '@/src/llm/WelcomePopup';
+import { LangButton } from '@/src/llm/i18n';
 
 export const metadata = {
   title: 'LLM Visualization',
@@ -13,6 +14,7 @@ export default function Page() {
     return <>
         <Header title="LLM Visualization">
             <InfoButton />
+            <LangButton />
         </Header>
         <LayerView />
         <div id="portal-container"></div>
